@@ -11,6 +11,7 @@ func main() {
 	app := niu.New()
 
 
+
 	app.Get("/go", func(ctx context.Context) { ctx.String("hello niu! a wondderful web framework!") })
 
 
