@@ -1,30 +1,11 @@
 package router
 
-import(
-	"net/http"
-)
+import "niu/util/array"
 
-// Route contains the information about a registered Route.
-type Route struct  {
-	//route list
-	RList map[string] func (http.ResponseWriter, *http.Request)
+var validMethods [5]string = [5]string {"GET", "POST", "HEAD", "PUT", "DELETE"}
 
-}
-
-//register a router
-func (r *Route) Add(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
-	r.RList[pattern] = handleFunc
-}
-
-
-func (r *Route) ServeHTTP(w http.ResponseWriter, request *http.Request){
-	reqUri := request.RequestURI
-	for pattern, handleFun := range r.RList {
-		if pattern == reqUri {
-			handleFun(w, request)
-			return
-		}
-	}
-	w.Write([]byte("404"))
+// is a valid request method
+func isValidMethod(method string) bool {
+	return array.InStringArray(method, validMethods[:])
 
 }
