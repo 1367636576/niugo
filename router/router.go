@@ -16,6 +16,7 @@ type Router struct  {
 
 }
 
+
 //register a router
 //method :request method
 func (r *Router) add(method string ,pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
@@ -67,4 +68,11 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, request *http.Request){
 	}
 	w.Write([]byte("404"))
 
+}
+
+// new router
+func NewRouter()  *Router {
+	routerInstance := &Router{}
+	routerInstance.RList = make(map[string]PatternHandlerMap)
+	return routerInstance
 }
