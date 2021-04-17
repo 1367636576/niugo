@@ -1,4 +1,4 @@
 # niugo
-create a go web framework named Niugo
+create a go web framework named Niu
 
-t
+
