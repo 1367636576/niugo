@@ -3,6 +3,7 @@ package niu
 import "net/http"
 //import "fmt"
 import "niu/router"
+import "niu/context"
 
 type Application struct {
 	//router
@@ -19,20 +20,20 @@ func New() *Application {
 	return app
 }
 
-func (a *Application)Get(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (a *Application)Get(pattern string, handleFunc func(context.Context))  {
 	a.Router.Get(pattern, handleFunc)
 }
 
-func (a *Application)Post(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (a *Application)Post(pattern string, handleFunc func(context.Context))  {
 	a.Router.Post(pattern, handleFunc)
 }
-func (a *Application)Put(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (a *Application)Put(pattern string, handleFunc func(context.Context))  {
 	a.Router.Put(pattern, handleFunc)
 }
-func (a *Application)Delete(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (a *Application)Delete(pattern string, handleFunc func(context.Context))  {
 	a.Router.Delete(pattern, handleFunc)
 }
-func (a *Application)Head(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (a *Application)Head(pattern string, handleFunc func(context.Context))  {
 	a.Router.Head(pattern, handleFunc)
 }
 

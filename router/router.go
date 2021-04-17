@@ -2,10 +2,11 @@ package router
 
 import(
 	"net/http"
+	"niu/context"
 )
 
 //Pattern Handle Function Map without request method(GET:POST:DELETE,ect...)
-type PatternHandlerMap map[string]func (http.ResponseWriter, *http.Request)
+type PatternHandlerMap map[string]func (context.Context)
 
 
 
@@ -19,7 +20,7 @@ type Router struct  {
 
 //register a router
 //method :request method
-func (r *Router) add(method string ,pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (r *Router) add(method string ,pattern string, handleFunc func(context.Context))  {
 	//invalid request method
 	if !isValidMethod(method) {
 		return
@@ -30,27 +31,27 @@ func (r *Router) add(method string ,pattern string, handleFunc func(http.Respons
 }
 
 //get request
-func (r *Router) Get(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (r *Router) Get(pattern string, handleFunc func(context.Context))  {
 	r.add("GET", pattern, handleFunc)
 }
 
 //post request
-func (r *Router) Post(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (r *Router) Post(pattern string, handleFunc func(context.Context))  {
 	r.add("POST", pattern, handleFunc)
 }
 
 //delete request
-func (r *Router) Delete(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (r *Router) Delete(pattern string, handleFunc func(context.Context))  {
 	r.add("DELETE", pattern, handleFunc)
 }
 
 //put request
-func (r *Router) Put(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (r *Router) Put(pattern string, handleFunc func(context.Context))  {
 	r.add("PUT", pattern, handleFunc)
 }
 
 //head request
-func (r *Router) Head(pattern string, handleFunc func(http.ResponseWriter, *http.Request))  {
+func (r *Router) Head(pattern string, handleFunc func(context.Context))  {
 	r.add("HEAD", pattern, handleFunc)
 }
 
@@ -60,13 +61,14 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, request *http.Request){
 	reqUri := request.RequestURI
 	reqMethod := request.Method
 
+	ctx := context.NewContext(w, request)
 	for pattern, handleFun := range r.RList[reqMethod] {
 		if pattern == reqUri {
-			handleFun(w, request)
+			handleFun(ctx)
 			return
 		}
 	}
-	w.Write([]byte("404"))
+	ctx.String("404")
 
 }
 
