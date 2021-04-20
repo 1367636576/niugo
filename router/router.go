@@ -3,6 +3,7 @@ package router
 import(
 	"net/http"
 	"niu/context"
+	"fmt"
 )
 
 //Pattern Handle Function Map without request method(GET:POST:DELETE,ect...)
@@ -26,7 +27,18 @@ func (r *Router) add(method string ,pattern string, handleFunc func(context.Cont
 		return
 	}
 
-	r.RList[method] = PatternHandlerMap{pattern: handleFunc}
+	patternHandlerMap := make(map[string]func (context.Context))
+
+	for pattern, val := range r.RList[method] {
+		patternHandlerMap[pattern] = val
+	}
+	patternHandlerMap[pattern] = handleFunc
+
+	//r.RList[method] = PatternHandlerMap{pattern: handleFunc}
+
+	r.RList[method] = patternHandlerMap
+	fmt.Println(patternHandlerMap)
+
 
 }
 
