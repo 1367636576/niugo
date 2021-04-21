@@ -7,7 +7,7 @@ import(
 )
 
 //Pattern Handle Function Map without request method(GET:POST:DELETE,ect...)
-type PatternHandlerMap map[string]func (context.Context)
+type PatternHandlerMap map[string]func (*context.Context)
 
 
 
@@ -16,18 +16,20 @@ type Router struct  {
 	//method[GET,POST,DELETE,HEAD,PUT] route list
 	RList map[string] PatternHandlerMap
 
+	handlers []func(*context.Context)
+
 }
 
 
 //register a router
 //method :request method
-func (r *Router) add(method string ,pattern string, handleFunc func(context.Context))  {
+func (r *Router) add(method string ,pattern string, handleFunc func(*context.Context))  {
 	//invalid request method
 	if !isValidMethod(method) {
 		return
 	}
 
-	patternHandlerMap := make(map[string]func (context.Context))
+	patternHandlerMap := make(map[string]func (*context.Context))
 
 	for pattern, val := range r.RList[method] {
 		patternHandlerMap[pattern] = val
@@ -43,28 +45,32 @@ func (r *Router) add(method string ,pattern string, handleFunc func(context.Cont
 }
 
 //get request
-func (r *Router) Get(pattern string, handleFunc func(context.Context))  {
+func (r *Router) Get(pattern string, handleFunc func(*context.Context))  {
 	r.add("GET", pattern, handleFunc)
 }
 
 //post request
-func (r *Router) Post(pattern string, handleFunc func(context.Context))  {
+func (r *Router) Post(pattern string, handleFunc func(*context.Context))  {
 	r.add("POST", pattern, handleFunc)
 }
 
 //delete request
-func (r *Router) Delete(pattern string, handleFunc func(context.Context))  {
+func (r *Router) Delete(pattern string, handleFunc func(*context.Context))  {
 	r.add("DELETE", pattern, handleFunc)
 }
 
 //put request
-func (r *Router) Put(pattern string, handleFunc func(context.Context))  {
+func (r *Router) Put(pattern string, handleFunc func(*context.Context))  {
 	r.add("PUT", pattern, handleFunc)
 }
 
 //head request
-func (r *Router) Head(pattern string, handleFunc func(context.Context))  {
+func (r *Router) Head(pattern string, handleFunc func(*context.Context))  {
 	r.add("HEAD", pattern, handleFunc)
+}
+
+func (r *Router) AddHandle(handleFn func(*context.Context)) {
+	r.handlers = append(r.handlers, handleFn)
 }
 
 
@@ -73,7 +79,8 @@ func (r *Router) ServeHTTP(w http.ResponseWriter, request *http.Request){
 	reqUri := request.RequestURI
 	reqMethod := request.Method
 
-	ctx := context.NewContext(w, request)
+	ctx := context.NewContext(w, request, r.handlers)
+	ctx.Next()
 	for pattern, handleFun := range r.RList[reqMethod] {
 		if pattern == reqUri {
 			handleFun(ctx)
